@@ -1,0 +1,87 @@
+import numpy as np
+
+# Given datasets
+x = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+y = np.array([1, 3, 2, 5, 7, 8, 8, 9, 10, 12])
+
+# Analytical Solution
+n = len(x)
+x_mean = np.mean(x)
+y_mean = np.mean(y)
+
+# Calculating beta1 and beta0
+beta1 = (n * np.sum(x * y) - np.sum(x) * np.sum(y)) / (n * np.sum(x**2) - (np.sum(x))**2)
+beta0 = y_mean - beta1 * x_mean
+
+# Predicted values
+y_pred = beta0 + beta1 * x
+
+# Sum of Squared Errors (SSE)
+SSE = np.sum((y - y_pred)**2)
+
+# Total Sum of Squares (SST)
+SST = np.sum((y - y_mean)**2)
+
+# R-squared (R2) Value
+R2 = 1 - (SSE / SST)
+
+print(f"Analytical Solution: beta0 = {beta0}, beta1 = {beta1}")
+print(f"SSE: {SSE}")
+print(f"R-squared: {R2}")
+
+# Gradient Descent Implementation (Full-Batch)
+def gradient_descent(x, y, learning_rate=0.01, epochs=1000):
+    beta0, beta1 = 0, 0
+    n = len(y)
+    
+    for _ in range(epochs):
+        y_pred = beta0 + beta1 * x
+        d_beta0 = (-2/n) * np.sum(y - y_pred)
+        d_beta1 = (-2/n) * np.sum((y - y_pred) * x)
+        
+        beta0 -= learning_rate * d_beta0
+        beta1 -= learning_rate * d_beta1
+    
+    return beta0, beta1
+
+beta0_gd, beta1_gd = gradient_descent(x, y)
+
+# Predicted values using Gradient Descent
+y_pred_gd = beta0_gd + beta1_gd * x
+
+# SSE and R2 for Gradient Descent
+SSE_gd = np.sum((y - y_pred_gd)**2)
+R2_gd = 1 - (SSE_gd / SST)
+
+print(f"Gradient Descent (Full-Batch): beta0 = {beta0_gd}, beta1 = {beta1_gd}")
+print(f"SSE: {SSE_gd}")
+print(f"R-squared: {R2_gd}")
+
+# Stochastic Gradient Descent Implementation (SGD)
+def stochastic_gradient_descent(x, y, learning_rate=0.01, epochs=1000):
+    beta0, beta1 = 0, 0
+    n = len(y)
+    
+    for _ in range(epochs):
+        for i in range(n):
+            y_pred = beta0 + beta1 * x[i]
+            d_beta0 = -2 * (y[i] - y_pred)
+            d_beta1 = -2 * (y[i] - y_pred) * x[i]
+            
+            beta0 -= learning_rate * d_beta0
+            beta1 -= learning_rate * d_beta1
+            
+    return beta0, beta1
+
+beta0_sgd, beta1_sgd = stochastic_gradient_descent(x, y)
+
+# Predicted values using SGD
+y_pred_sgd = beta0_sgd + beta1_sgd * x
+
+# SSE and R2 for SGD
+SSE_sgd = np.sum((y - y_pred_sgd)**2)
+R2_sgd = 1 - (SSE_sgd / SST)
+
+print(f"Stochastic Gradient Descent: beta0 = {beta0_sgd}, beta1 = {beta1_sgd}")
+print(f"SSE: {SSE_sgd}")
+print(f"R-squared: {R2_sgd}")
